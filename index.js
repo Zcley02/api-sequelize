@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const morgan = require('morgan');
+const furniture = require('./routes/furniture');
 
 const user = require('./routes/user');
 
@@ -18,6 +19,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', user);
+app.use('/furniture', furniture)
 
 app.listen(PORT, () => {
     console.log("Server is running");

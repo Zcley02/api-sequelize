@@ -1,33 +1,21 @@
-'use strict';
+"use strict";
+
+const FurnitureSchema = require("../models/schema/furniture.schema");
+const CategorySchema = require("../models/schema/category.schema");
+
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Furniture', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      name: {
-        type: Sequelize.STRING
-      },
-      description: {
-        type: Sequelize.STRING
-      },
-      price: {
-        type: Sequelize.DOUBLE
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
+    await queryInterface.createTable(
+      "Categories",
+      CategorySchema(Sequelize.DataTypes)
+    );
+    await queryInterface.createTable(
+      "Furniture",
+      FurnitureSchema(Sequelize.DataTypes)
+    );
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Furniture');
-  }
+    await queryInterface.dropTable("Furniture");
+    await queryInterface.dropTable("Categories");
+  },
 };
