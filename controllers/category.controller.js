@@ -52,11 +52,7 @@ const updateCategory = async (req, res) => {
 
   try {
     const category = await Category.findByPk(id);
-    const updatedCategory = await category.update(data, {
-        where: {
-            id
-        }
-    });
+    const updatedCategory = await category.update(data);
 
     res.json({
       success: true,
