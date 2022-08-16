@@ -18,6 +18,12 @@ const findCategory = async (req, res) => {
   try {
     const category = await Category.findByPk(id);
 
+    if(!category) {
+      return res.status(500).json({
+        error: "The category does not exist"
+      });
+    }
+
     res.json(category);
   } catch (error) {
     res.status(500).json({
