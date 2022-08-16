@@ -10,6 +10,7 @@ const options = {
 const JwtStrategy = new Strategy(options, 
     async (payload, done) => {
     try {
+        console.log(payload)
         return done(null, payload);
     } catch (error) {
         return done(error, false);

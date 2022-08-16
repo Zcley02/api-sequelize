@@ -108,7 +108,7 @@ const recoverPassword = async (req, res) => {
     });
 
     if (!user) {
-      throw boom.unauthorized();
+      throw boom.unauthorized("Email does not exist");
     }
 
     const token = signToken(user.id, user.email);
