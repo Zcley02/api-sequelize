@@ -24,6 +24,10 @@ const UserSchema = (DataTypes) => {
       allowNull: false,
       type: DataTypes.STRING,
     },
+    profilePic: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
     active: {
       allowNull: false,
       type: DataTypes.BOOLEAN,

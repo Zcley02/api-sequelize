@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 const passport = require("passport");
 const router = express.Router();
 
@@ -14,9 +15,13 @@ const {
   recoverySchema,
   changePasswordSchema,
 } = require("../schema/auth.schema");
+const storage = require("../utils/multer/multer");
+
+const upload = multer({storage: storage});
 
 router.post(
-  "/signup", 
+  "/signup",
+  upload.single("profilePic"),
   validatorFieldsHandler(signUpSchema, "body"), 
   signUp
 );

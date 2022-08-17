@@ -9,6 +9,11 @@ const User = require("../models").User;
 
 const signUp = async (req, res) => {
   const { email, password } = req.body;
+  let url = "http://localhost:3000/uploads/defaultPic.jpg";
+
+  if (req.file) {
+    url = "http://localhost:3000/uploads/" + req.file.filename;
+  }
 
   try {
     const findUser = await User.findOne({
@@ -29,6 +34,7 @@ const signUp = async (req, res) => {
     const user = await User.create({
       ...req.body,
       password: newPassword,
+      profilePic: url,
     });
 
     const token = signToken(user.id, user.firstName, config.jwtAuth);
@@ -43,7 +49,6 @@ const signUp = async (req, res) => {
     const sent = await sendMail(mail);
 
     res.json(sent);
-
   } catch (error) {
     res.status(500).json({
       error: error.message,
@@ -52,26 +57,21 @@ const signUp = async (req, res) => {
 };
 
 const activeUser = async (req, res) => {
-
   const { token } = req.body;
 
   try {
-    
     const payload = jwt.verify(token, config.jwtAuth);
-    console.log(payload);
-    const user = await updateUser(payload.id, { active: true });
+    await updateUser(payload.id, { active: true });
 
     res.json({
-      "message" : "The user is active"
+      message: "The user is active",
     });
-
   } catch (error) {
     res.status(500).json({
       error: error.message,
     });
   }
-
-}
+};
 
 const login = async (email, password) => {
   const user = await User.findOne({
@@ -82,7 +82,8 @@ const login = async (email, password) => {
 
   if (!user) {
     throw boom.unauthorized("This is email is not registered");
-  } if (!user.active){
+  }
+  if (!user.active) {
     throw boom.unauthorized("This account is not active");
   }
 
@@ -114,7 +115,11 @@ const changePassword = async (req, res) => {
 
     const salt = bcrypt.genSaltSync();
     const hashPass = bcrypt.hashSync(newPassword, salt);
-    await updateUser(user.id, { recoveryToken: null, password: hashPass, active: true });
+    await updateUser(user.id, {
+      recoveryToken: null,
+      password: hashPass,
+      active: true,
+    });
 
     res.json({
       message: "password changed",
@@ -165,5 +170,5 @@ module.exports = {
   login,
   recoverPassword,
   changePassword,
-  activeUser
+  activeUser,
 };
