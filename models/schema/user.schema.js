@@ -21,12 +21,17 @@ const UserSchema = (DataTypes) => {
       type: DataTypes.STRING,
     },
     password: {
-        allowNull: false,
-        type: DataTypes.STRING
+      allowNull: false,
+      type: DataTypes.STRING,
+    },
+    active: {
+      allowNull: false,
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     recoveryToken: {
       allowNull: true,
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     createdAt: {
       allowNull: false,

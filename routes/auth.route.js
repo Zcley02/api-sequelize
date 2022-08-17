@@ -6,6 +6,7 @@ const {
   signUp,
   recoverPassword,
   changePassword,
+  activeUser,
 } = require("../controllers/auth.controller");
 const validatorFieldsHandler = require("../middlewares/validator.handler");
 const {
@@ -39,6 +40,10 @@ router.post(
   "/change-password",
   validatorFieldsHandler(changePasswordSchema, "body"),
   changePassword
+);
+router.post(
+  "/active-user",
+  activeUser
 );
 
 module.exports = router;

@@ -31,20 +31,47 @@ const signUp = async (req, res) => {
       password: newPassword,
     });
 
-    delete user.dataValues.password;
+    const token = signToken(user.id, user.firstName, config.jwtAuth);
+    const link = `http://nose.com/active-user?token=${token}`;
+    const mail = {
+      from: config.emailSmtp,
+      to: `${user.email}`,
+      subject: "Email para activar cuenta",
+      html: `<b>Ingresa a este link => ${link}</b>`,
+    };
 
-    const token = signToken(user.id, user.firstName);
+    const sent = await sendMail(mail);
 
-    res.json({
-      user,
-      token,
-    });
+    res.json(sent);
+
   } catch (error) {
     res.status(500).json({
       error: error.message,
     });
   }
 };
+
+const activeUser = async (req, res) => {
+
+  const { token } = req.body;
+
+  try {
+    
+    const payload = jwt.verify(token, config.jwtAuth);
+    console.log(payload);
+    const user = await updateUser(payload.id, { active: true });
+
+    res.json({
+      "message" : "The user is active"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+
+}
 
 const login = async (email, password) => {
   const user = await User.findOne({
@@ -55,6 +82,8 @@ const login = async (email, password) => {
 
   if (!user) {
     throw boom.unauthorized("This is email is not registered");
+  } if (!user.active){
+    throw boom.unauthorized("This account is not active");
   }
 
   const validPass = bcrypt.compareSync(password, user.password);
@@ -64,7 +93,7 @@ const login = async (email, password) => {
 
   delete user.dataValues.password;
 
-  const token = signToken(user.id, user.firstName);
+  const token = signToken(user.id, user.firstName, config.jwtSecret);
 
   return {
     user,
@@ -76,8 +105,8 @@ const changePassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
-    const paylaod = jwt.verify(token, config.jwtSecret);
-    const user = await User.findByPk(paylaod.id);
+    const payload = jwt.verify(token, config.jwtAuth);
+    const user = await User.findByPk(payload.id);
     console.log(user);
     if (user.recoveryToken !== token) {
       throw boom.unauthorized();
@@ -85,7 +114,7 @@ const changePassword = async (req, res) => {
 
     const salt = bcrypt.genSaltSync();
     const hashPass = bcrypt.hashSync(newPassword, salt);
-    await updateUser(user.id, { recoveryToken: null, password: hashPass });
+    await updateUser(user.id, { recoveryToken: null, password: hashPass, active: true });
 
     res.json({
       message: "password changed",
@@ -111,9 +140,9 @@ const recoverPassword = async (req, res) => {
       throw boom.unauthorized("Email does not exist");
     }
 
-    const token = signToken(user.id, user.email);
+    const token = signToken(user.id, user.firstName, config.jwtAuth);
     const link = `http://nose.com/recovery?token=${token}`;
-    await updateUser(user.id, { recoveryToken: token });
+    await updateUser(user.id, { recoveryToken: token, active: false });
     const mail = {
       from: config.emailSmtp,
       to: `${user.email}`,
@@ -136,4 +165,5 @@ module.exports = {
   login,
   recoverPassword,
   changePassword,
+  activeUser
 };

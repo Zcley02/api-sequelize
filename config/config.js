@@ -16,6 +16,7 @@ module.exports = {
     } 
   },
   jwtSecret: process.env.JWT_SECRET,
+  jwtAuth: process.env.JWT_AUTH,
   emailSmtp: process.env.EMAIL_SMTP,
   passSmtp: process.env.PASS_SMTP
 }
