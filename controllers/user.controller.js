@@ -1,6 +1,7 @@
 const boom = require("@hapi/boom");
 const User = require("../models").User;
 const bcrypt = require("bcrypt");
+const { deleteFile } = require("../utils/multer/multer");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -30,6 +31,7 @@ const updateUser = async (id, data) => {
 const updateProfileUser = async (req, res) => {
 
   const { id } = req.user;
+  let data = req.body;
 
   try {
     
@@ -44,8 +46,15 @@ const updateProfileUser = async (req, res) => {
 
     }
 
-    const updatedUser = await user.update(req.body);
+    if(req.file){
+      await deleteFile(user.profilePic);
+      data = {
+        ...data,
+        profilePic: req.file.filename
+      }
+    }
 
+    const updatedUser = await user.update(data);
     delete updatedUser.dataValues.password;
 
     res.json({

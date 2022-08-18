@@ -15,7 +15,7 @@ const {
   recoverySchema,
   changePasswordSchema,
 } = require("../schema/auth.schema");
-const storage = require("../utils/multer/multer");
+const {storage} = require("../utils/multer/multer");
 
 const upload = multer({storage: storage});
 

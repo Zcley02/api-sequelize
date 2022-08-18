@@ -9,10 +9,10 @@ const User = require("../models").User;
 
 const signUp = async (req, res) => {
   const { email, password } = req.body;
-  let url = "http://localhost:3000/uploads/defaultPic.jpg";
+  let url = "defaultPic.jpg";
 
   if (req.file) {
-    url = "http://localhost:3000/uploads/" + req.file.filename;
+    url = req.file.filename;
   }
 
   try {
@@ -97,7 +97,10 @@ const login = async (email, password) => {
   const token = signToken(user.id, user.firstName, config.jwtSecret);
 
   return {
-    user,
+    user: {
+      ...user.dataValues,
+      profilePic: `http://localhost:3000/uploads/${user.profilePic}`
+    },
     token,
   };
 };
